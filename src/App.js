@@ -25,14 +25,24 @@ function App() {
   const [initialCoordinate, setInitialCoordinate] = useState(null)
   const [soloCar, setSoloCar] = useState(null)
   const [milliTimeInSecond, setTimeInMilliSeconds] = useState(0)
-  
+  const [name, setName] = useState('')
+  const [laps, setLaps] = useState(1)
+  const [leaderboard, setLeaderboard] = useState([])
+  const [lapRecord, setLapRecord] = useState([])
+
+
+
+
+
 
   const runTimer = () => {
     if (raceStart) {
       if (milliTimeInSecond < 5000) {
 
         setTimeInMilliSeconds(prev => prev + 1)
-      }else{
+      } else {
+        setLapRecord(prev => prev.push({ name, laps }))
+        setTimeInMilliSeconds(0)
 
       }
 
@@ -70,7 +80,8 @@ function App() {
     if (soloCar && predictions) {
       setRaceStart(true)
     } else {
-      setModalOpen('No car detected to start the race.')
+      // setModalOpen('No car detected to start the race.')
+      alert("No car found")
     }
   }
   const handleStop = () => {
@@ -154,7 +165,7 @@ function App() {
                   Name
                 </Typography>
               </FormLabel>
-              <TextField value={''} onChange={(e) => { }} />
+              <TextField value={name} onChange={(e) => { setName(e.target.value) }} />
             </FormControl>
             <FormControl>
               <FormLabel>
@@ -165,13 +176,15 @@ function App() {
               <Select
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
-                value={''}
+                value={laps}
                 label="Age"
-                onChange={() => { }}
+                onChange={(e) => {
+                  setLaps(e.target.value)
+                }}
               >
-                <MenuItem value={10}>Ten</MenuItem>
-                <MenuItem value={20}>Twenty</MenuItem>
-                <MenuItem value={30}>Thirty</MenuItem>
+                <MenuItem value={1}>1</MenuItem>
+                <MenuItem value={2}>2</MenuItem>
+                <MenuItem value={3}>3</MenuItem>
               </Select>
             </FormControl>
             <Button onClick={handleStart} variant='contained'>
