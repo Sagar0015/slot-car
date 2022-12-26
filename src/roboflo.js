@@ -1,32 +1,30 @@
+import { Backdrop, CircularProgress, Typography } from "@mui/material";
 import { Box } from "@mui/system";
-import { useRef, useEffect } from "react";
+import { orderBy } from "lodash";
+import { useRef, useEffect, useState } from "react";
 import Webcam from "react-webcam";
 
 export const key = 'rf_BfXqX0b70aeyibaAl5eRhqgy2yJ3'
 const Roboflow = (props) => {
+  const { initialCoordinate } = props
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
-  let ctx
-  let circle = new Path2D();
+
+  const [Coordinates, setCoordinates] = useState(null)
+  const [RoboModel, setRoboModel] = useState(null)
+
+
+  useEffect(() => {
+    if (initialCoordinate) {
+      setCoordinates(initialCoordinate)
+    }
+  }, [initialCoordinate])
 
 
   var inferRunning;
   var model;
 
-  useEffect(() => {
-    console.log('dasd')
 
-    if (canvasRef?.current) {
-      console.log('dasd123')
-
-      ctx = canvasRef?.current?.getContext("2d");
-      canvasRef?.current?.addEventListener('mousedown', function (e) {
-        console.log('canvas click event1', e, ctx)
-        props.handleSetFinishLineCoordinate(canvasRef?.current, e, ctx)
-
-      })
-    }
-  }, [canvasRef])
 
   const startInfer = () => {
     inferRunning = true;
@@ -41,16 +39,32 @@ const Roboflow = (props) => {
           console.log("model loaded");
         }
       }).then((model) => {
-        setInterval(() => {
-          if (inferRunning) detect(model);
-          circle.arc(63, 316, 50, 0, 2 * Math.PI);
-          ctx.fillStyle = 'red';
-          ctx.fill(circle);
-        }, 10);
+        if (inferRunning) {
+          console.log('model running')
+          setRoboModel(model)
+        }
+
+
       });
   };
 
   useEffect(startInfer, []);
+
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (RoboModel) {
+        detect(RoboModel)
+
+
+      } else {
+        clearInterval(interval)
+      }
+    }, 10);
+    return () => clearInterval(interval);
+  }, [RoboModel, Coordinates]);
+
+
 
   // const stopInfer = () => {
   //     inferRunning = false;
@@ -75,8 +89,9 @@ const Roboflow = (props) => {
       const detections = await model.detect(webcamRef.current.video);
 
       props.handleSetPrediction(detections)
+      const ctx = canvasRef?.current?.getContext("2d");
 
-      // drawBoxes(detections, ctx);
+      drawBoxes(detections, ctx);
     }
   };
 
@@ -92,6 +107,17 @@ const Roboflow = (props) => {
 
   const drawBoxes = (detections, ctx) => {
     ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+
+    if (Coordinates) {
+      ctx.beginPath();
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = 'red'
+      const orderedByConfindence = orderBy(detections, (item) => item?.bbox, ['confidence'])
+
+      ctx.rect(Coordinates?.x - 10, Coordinates?.y - 10, Coordinates?.width + 20, Coordinates?.height + 20);
+      ctx.stroke();
+      const isPointInPath = ctx.isPointInPath(Coordinates?.bbox?.x, Coordinates?.bbox?.y);
+    }
     detections.forEach((row) => {
       if (true) {
         //video
@@ -105,8 +131,10 @@ const Roboflow = (props) => {
       if (row.confidence < 0) return;
       if (ctx) {
         //dimensions
-        var x = row.x - row.width / 2;
-        var y = row.y - row.height / 2;
+        // var x = row.x - row.width / 2;
+        // var y = row.y - row.height / 2;
+        var x = row.x
+        var y = row.y
         var w = row.width;
         var h = row.height;
 
@@ -181,11 +209,29 @@ const Roboflow = (props) => {
         style={{ position: 'absolute', inset: 0, zIndex: 10, textAlign: 'center' }
         }
         className="absolute mx-auto left-0 right-0 text-center z-10"
+        videoConstraints={{
+          facingMode: 'environment'
+        }}
       />
       <canvas ref={canvasRef}
         style={{ position: 'absolute', inset: 0, zIndex: 20, textAlign: 'center' }}
 
         className="absolute mx-auto left-0 right-0 text-center z-20" />
+
+      <Backdrop
+        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={!RoboModel}
+        onClick={() => {
+
+        }}
+      >
+        <Box display={'flex'} flexDirection={'column'} justifyContent={'center'} alignItems={'center'} gap={'20px'}>
+
+          <CircularProgress />
+          <Typography color="white">Modal loading</Typography>
+        </Box>
+      </Backdrop>
+
     </>
   );
 };

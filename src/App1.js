@@ -2,7 +2,7 @@ import logo from './logo.svg';
 import './App.css';
 import { Box, Button, FormControl, FormLabel, Grid, MenuItem, Paper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material';
 import React, { Fragment, useEffect, useState } from 'react';
-import _, { isEqual, orderBy, sumBy } from 'lodash'
+import _, { isEmpty, isEqual, orderBy, sumBy } from 'lodash'
 import Roboflow from './roboflo';
 import SimpleSnackbar from './components/Snackbar';
 
@@ -19,44 +19,61 @@ function App() {
   const [leaderboard, setLeaderboard] = useState([])
   const [predictions, setPredictions] = useState([])
 
+  const [initialCoordinate, setInitialCoordinate] = useState(null)
+  const [soloCar, setSoloCar] = useState(null)
+
 
 
   useEffect(() => {
     const interval = setInterval(() => {
       if (raceStart) {
-        setMillieSecond(seconds => seconds + 500);
+        setMillieSecond((seconds) => seconds + 200);
 
       } else {
         setMillieSecond(0)
         clearInterval(interval)
       }
-    }, 500);
+    }, 200);
     return () => clearInterval(interval);
   }, [raceStart]);
-
-  console.log('millieSecond', millieSecond, lapEnd)
 
   //check if lap isCompleted
   useEffect(() => {
     if (lapEnd) {
-      setLapRecord([...lapRecord, { time: millieSecond, laps: lapRecord.length + 1 }])
+      setLapRecord([...lapRecord, { time: ((millieSecond / 1000)), laps: lapRecord.length + 1 }])
       setMillieSecond(0)
       setLapEnds(false)
     }
   }, [lapEnd])
 
-  //To be removed : for now end lap in 3 sec
+
+  function randomIntFromInterval(min, max) { // min and max included 
+    return Math.floor(Math.random() * (max - min + 1) + min)
+  }
+
   useEffect(() => {
-    if (millieSecond === 3000) {
+    const time = randomIntFromInterval(3000, 4000)
+
+    let checkIfLapEnds = predictions && checkIfCarIsInFinishRectangle(
+      {
+        x: predictions[0]?.bbox?.x,
+        y: predictions[0]?.bbox?.y,
+        width: predictions[0]?.bbox?.width,
+        height: predictions[0]?.bbox?.height
+      }
+
+    )
+    if (checkIfLapEnds && millieSecond > 3000) {
       setLapEnds(true)
 
     }
+
   }, [millieSecond])
 
   //check if race is completed 
   useEffect(() => {
     if (lapRecord.length === laps) {
-      let average = (Number(sumBy(lapRecord, 'time') / lapRecord.length) / 1000).toFixed(2);
+      let average = (Number(sumBy(lapRecord, 'time') / lapRecord.length)).toFixed(2);
       setAverageTime(average)
       setRaceStart(false)
     }
@@ -65,11 +82,15 @@ function App() {
 
   const handleStart = () => {
     setRaceStart(true)
+    setAverageTime(null)
+    setLapRecord([])
+    setLapEnds(false)
+
   }
 
   const handleStop = () => {
     setRaceStart(false)
-    let average = (Number(sumBy(lapRecord, 'time') / lapRecord.length) / 1000).toFixed(2)
+    let average = (Number(sumBy(lapRecord, 'time') / lapRecord.length)).toFixed(2)
     setAverageTime(average);
     let finalObj = {
       name,
@@ -77,6 +98,11 @@ function App() {
       average
     }
     setLeaderboard([...leaderboard, finalObj])
+    setLapRecord([])
+    setLapEnds(false)
+    setLaps(3)
+    setName('')
+
   }
   const handleReset = () => {
     setRaceStart(false)
@@ -88,8 +114,39 @@ function App() {
 
   }
 
-  
+  useEffect(() => {
+    if (!raceStart && !!predictions.length) {
 
+      setSoloCar(predictions[0])
+      setInitialCoordinate(predictions[0]?.bbox)
+    }
+    if (raceStart) {
+      // console.log('prediction', predictions[0], 'soloCar', soloCar, 'initialCoordinate', initialCoordinate
+      // )
+
+
+    }
+  }, [predictions])
+
+
+
+  const checkIfCarIsInFinishRectangle = (rectB) => {
+    let rectA = {
+      x: initialCoordinate?.x - 100,
+      y: initialCoordinate?.y - 100,
+      width: initialCoordinate?.width + 100,
+      height: initialCoordinate?.height + 100
+    }
+    if (rectB) {
+      return !(rectA.x + rectA.width < rectB.x ||
+        rectB.x + rectB.width < rectA.x ||
+        rectA.y + rectA.height < rectB.y ||
+        rectB.y + rectB.height < rectA.y);
+    }
+
+    return false
+
+  };
   const handleSetPrediction = (data) => {
     const orderedByConfindence = _.orderBy(data, (item) => item?.bbox, ['confidence'])
     setPredictions(orderedByConfindence)
@@ -109,6 +166,7 @@ function App() {
               handleSetPrediction={handleSetPrediction}
               modelName="slot-car-racing" modelVersion="1"
               handleSetFinishLineCoordinate={handleSetFinishLineCoordinate}
+              initialCoordinate={initialCoordinate}
 
             />
           </Box>
@@ -170,16 +228,7 @@ function App() {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      <TableRow
 
-                      >
-                        <TableCell component="th" scope="row">
-                          name
-                        </TableCell>
-                        <TableCell align="right">123</TableCell>
-
-
-                      </TableRow>
                       {lapRecord && lapRecord.map(data => (
                         <TableRow
 
@@ -187,7 +236,7 @@ function App() {
                           <TableCell component="th" scope="row">
                             {data?.laps}
                           </TableCell>
-                          <TableCell align="right">                          {data?.time}
+                          <TableCell align="right">                          {data?.time.toFixed(2)} sec
                           </TableCell>
                         </TableRow>
                       ))}
@@ -199,7 +248,7 @@ function App() {
                 {!!lapRecord.length && averageTime && <Typography variant={"h6"}>Average time {averageTime}sec</Typography>}
               </Box>
               <Box display={'flex'} gap={'30px'} justifyContent={'space-around'}>
-                <Button onClick={handleStop} fullWidth color="error" variant='contained'>
+                <Button disabled={isEmpty(lapRecord)} onClick={handleStop} fullWidth color="error" variant='contained'>
                   Stop and save
                 </Button>   <Button onClick={handleReset} fullWidth variant='contained'>
                   Reset
