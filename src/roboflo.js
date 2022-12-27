@@ -83,7 +83,7 @@ const Roboflow = (props) => {
 
       webcamRef.current.video.width = videoWidth;
       webcamRef.current.video.height = videoHeight;
-
+      console.log(webcamRef.current)
       adjustCanvas(videoWidth, videoHeight);
 
       const detections = await model.detect(webcamRef.current.video);
@@ -206,17 +206,22 @@ const Roboflow = (props) => {
       < Webcam
         ref={webcamRef}
         muted={true}
-        style={{ position: 'absolute', inset: 0, zIndex: 10, textAlign: 'center' }
+        style={{
+          position: 'absolute', inset: 0, zIndex: 10, textAlign: 'center', borderRadius: '30px',
+          boxShadow: '0 13px 0 0 rgb(31 6 85 / 44%)'
+          ,
         }
-        className="absolute mx-auto left-0 right-0 text-center z-10"
+        }
+        width="100%"
+        height={'100%'}
         videoConstraints={{
-          facingMode: 'environment'
+          facingMode: 'environment',
         }}
       />
       <canvas ref={canvasRef}
-        style={{ position: 'absolute', inset: 0, zIndex: 20, textAlign: 'center' }}
+        style={{ position: 'absolute', inset: 0, zIndex: 20, textAlign: 'center', }}
 
-        className="absolute mx-auto left-0 right-0 text-center z-20" />
+      />
 
       <Backdrop
         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
