@@ -7,6 +7,8 @@ import Roboflow from './roboflo';
 import SimpleSnackbar from './components/Snackbar';
 import Topbar from './components/Topbar';
 import layer from './assets/layer.svg'
+import { ThemeProvider } from '@mui/system';
+import { appTheme } from './theme';
 
 function App() {
   const videoRef = React.useRef()
@@ -18,7 +20,9 @@ function App() {
   const [lapRecord, setLapRecord] = useState([])
   const [averageTime, setAverageTime] = useState(null)
   const [millieSecond, setMillieSecond] = useState(0)
-  const [leaderboard, setLeaderboard] = useState([])
+  const [leaderboard, setLeaderboard] = useState([
+
+  ])
   const [predictions, setPredictions] = useState([])
 
   const [initialCoordinate, setInitialCoordinate] = useState(null)
@@ -171,112 +175,116 @@ function App() {
 
   }
   return (
-    <Box>
-      <Box p={'10px 0 30px 0'} sx={{ background: `linear-gradient(0deg,#009FFD,rgba(31,6,85,.1)),url(${layer}),linear-gradient(180deg,#1f0655,#009FFD)` }}>
-        <Topbar />
-        <Box display={'flex'} alignItems={'center'} gap={'30px'} p={'0 30px'}>
-          <Box display={'flex'} width={'50%'} flexDirection={'column'} gap={'15px'}>
-            <FormControl>
-              <FormLabel>
-                <Typography color="white">
-                  Name
+    <ThemeProvider theme={appTheme}>
+
+      <Box bgcolor={'#f0eef9'}>
+        <Box p={'10px 0 30px 0'} sx={{ background: `linear-gradient(0deg,#009FFD,rgba(31,6,85,.1)),url(${layer}),linear-gradient(180deg,#1f0655,#009FFD)` }}>
+          <Topbar />
+          <Box display={'flex'} alignItems={'center'} gap={'30px'} p={'0 30px'}>
+            <Box display={'flex'} width={'50%'} flexDirection={'column'} gap={'15px'}>
+              <FormControl>
+                <FormLabel>
+                  <Typography color="white">
+                    Name
+                  </Typography>
+                </FormLabel>
+                <TextField inputProps={{ style: { background: '#fff' } }} value={name} onChange={(e) => { setName(e.target.value) }} />
+              </FormControl>
+              <FormControl>
+                <FormLabel>
+                  <Typography color="white">
+                    No of laps
+                  </Typography>
+                </FormLabel>
+                <Select
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  value={laps}
+                  label="Age"
+                  onChange={(e) => {
+                    setLaps(e.target.value)
+                  }}
+                  sx={{ background: '#fff' }}
+                >
+                  <MenuItem value={1}>1</MenuItem>
+                  <MenuItem value={2}>2</MenuItem>
+                  <MenuItem value={3}>3</MenuItem>
+                  <MenuItem value={4}>4</MenuItem>
+                  <MenuItem value={5}>5</MenuItem>
+                  <MenuItem value={6}>6</MenuItem>
+
+                </Select>
+              </FormControl>
+              <Button color={'primary'} onClick={handleStart} disabled={raceStart} variant='contained'>
+                <Typography fontSize={'medium'} fontWeight={500} >
+                  Start
                 </Typography>
-              </FormLabel>
-              <TextField inputProps={{ style: { background: '#fff' } }} value={name} onChange={(e) => { setName(e.target.value) }} />
-            </FormControl>
-            <FormControl>
-              <FormLabel>
-                <Typography color="white">
-                  No of laps
-                </Typography>
-              </FormLabel>
-              <Select
-                labelId="demo-simple-select-label"
-                id="demo-simple-select"
-                value={laps}
-                label="Age"
-                onChange={(e) => {
-                  setLaps(e.target.value)
-                }}
-                sx={{ background: '#fff' }}
-              >
-                <MenuItem value={1}>1</MenuItem>
-                <MenuItem value={2}>2</MenuItem>
-                <MenuItem value={3}>3</MenuItem>
-                <MenuItem value={4}>4</MenuItem>
-                <MenuItem value={5}>5</MenuItem>
-                <MenuItem value={6}>6</MenuItem>
-
-              </Select>
-            </FormControl>
-            <Button onClick={handleStart} disabled={raceStart} variant='contained'>
-              Start
-            </Button>
-            <Box>
-              <TableContainer component={Paper}>
-                <Table aria-label="simple table">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>
-                        <Typography fontWeight={600}>
-                          Laps
-                        </Typography>
-                      </TableCell>
-                      <TableCell align="right">
-                        <Typography fontWeight={600}>
-                          Time
-                        </Typography></TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-
-                    {lapRecord && lapRecord.map(data => (
-                      <TableRow
-
-                      >
-                        <TableCell component="th" scope="row">
-                          {data?.laps}
-                        </TableCell>
-                        <TableCell align="right">                          {data?.time.toFixed(2)} sec
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Box>
-            <Box>
-              {!!lapRecord.length && averageTime && <Typography variant={"h6"}>Average time {averageTime}sec</Typography>}
-            </Box>
-            <Box display={'flex'} gap={'30px'} justifyContent={'space-around'}>
-              <Button disabled={isEmpty(lapRecord)} onClick={handleStop} fullWidth color="error" variant='contained'>
-                Stop and save
-              </Button>   <Button onClick={handleReset} fullWidth variant='contained'>
-                Reset
               </Button>
+              <Box>
+                <TableContainer component={Paper}>
+                  <Table aria-label="simple table">
+                    <TableHead >
+                      <TableRow >
+                        <TableCell>
+                          <Typography fontWeight={600}>
+                            Laps
+                          </Typography>
+                        </TableCell>
+                        <TableCell align="right">
+                          <Typography fontWeight={600}>
+                            Time
+                          </Typography></TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+
+                      {lapRecord && lapRecord.map(data => (
+                        <TableRow
+
+                        >
+                          <TableCell component="th" scope="row">
+                            {data?.laps}
+                          </TableCell>
+                          <TableCell align="right">                          {data?.time.toFixed(2)} sec
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </Box>
+              <Box>
+                {!!lapRecord.length && averageTime && <Typography variant={"h6"}>Average time {averageTime}sec</Typography>}
+              </Box>
+              <Box display={'flex'} gap={'30px'} justifyContent={'space-around'}>
+                <Button disabled={isEmpty(lapRecord)} onClick={handleStop} fullWidth color="error" variant='contained'>
+                  Stop and save
+                </Button>   <Button onClick={handleReset} fullWidth variant='contained'>
+                  Reset
+                </Button>
+              </Box>
+            </Box>
+            <Box position={'relative'} margin={'0 auto'} width={'50%'} height={'80vh'}>
+
+              <Roboflow
+                handleSetPrediction={handleSetPrediction}
+                modelName="slot-car-racing" modelVersion="1"
+                handleSetFinishLineCoordinate={handleSetFinishLineCoordinate}
+                initialCoordinate={initialCoordinate}
+
+              />
             </Box>
           </Box>
-          <Box position={'relative'} margin={'0 auto'} width={'50%'} height={'80vh'}>
 
-            <Roboflow
-              handleSetPrediction={handleSetPrediction}
-              modelName="slot-car-racing" modelVersion="1"
-              handleSetFinishLineCoordinate={handleSetFinishLineCoordinate}
-              initialCoordinate={initialCoordinate}
-
-            />
-          </Box>
         </Box>
+        <Box p={'40px'}>
 
-      </Box>
-      <Box p={'40px'}>
+          <Grid container spacing={4}>
 
-        <Grid container spacing={4}>
+            <Fragment>
 
-          <Fragment>
-
-            <Grid item xs={6}>
-              {/* <Box display={'flex'} flexDirection={'column'} gap={'15px'}>
+              <Grid item xs={6}>
+                {/* <Box display={'flex'} flexDirection={'column'} gap={'15px'}>
                 <FormControl>
                   <FormLabel>
                     <Typography color="black">
@@ -356,57 +364,62 @@ function App() {
                   </Button>
                 </Box>
               </Box> */}
-            </Grid>
-            <Grid item xs={6}>
-              <TableContainer component={Paper}>
-                <Table aria-label="simple table">
-                  <TableHead sx={{ background: '#0EB3E852' }}>
-                    <TableRow>
-                      <TableCell>
-                        <Typography fontWeight={600}>
-                          Name
-                        </Typography>
-                      </TableCell>
-                      <TableCell align="right">
-                        <Typography fontWeight={600}>
-                          Laps
-                        </Typography></TableCell>
-                      <TableCell align="right">
-                        <Typography fontWeight={600}>
-                          Average time
-                        </Typography>
-                      </TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {leaderboard && orderBy(leaderboard, ['laps', 'average',], ['desc', 'asc']).map(data => (
-                      <TableRow
-
-                      >
-                        <TableCell component="th" scope="row">
-                          {data?.name}
+              </Grid>
+              <Grid item xs={6}>
+                <TableContainer sx={{ background: '#fff' }} component={Paper}>
+                  <Table aria-label="simple table">
+                    <TableHead sx={{ background: '#847ad1' }}>
+                      <TableRow>
+                        <TableCell>
+                          <Typography color={'white'} fontWeight={600}>
+                            Name
+                          </Typography>
                         </TableCell>
                         <TableCell align="right">
-                          {data?.laps}
-
-                        </TableCell>
+                          <Typography color={'white'} fontWeight={600}>
+                            Laps
+                          </Typography></TableCell>
                         <TableCell align="right">
-                          {data?.average}
-
+                          <Typography color={'white'} fontWeight={600}>
+                            Average time
+                          </Typography>
                         </TableCell>
-
                       </TableRow>
-                    ))}
+                    </TableHead>
+                  </Table>
+                </TableContainer>
+                <TableContainer sx={{ height: '430px', overflow: 'auto', background: '#fff' }} >
+                  <Table>
+                    <TableBody>
+                      {leaderboard && orderBy(leaderboard, ['laps', 'average',], ['desc', 'asc']).map(data => (
+                        <TableRow
 
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Grid>
-          </Fragment>
-        </Grid>
-        <SimpleSnackbar open={modalOpen} setOpen={setModalOpen} />
-      </Box >
-    </Box>
+                        >
+                          <TableCell component="th" scope="row">
+                            {data?.name}
+                          </TableCell>
+                          <TableCell align="right">
+                            {data?.laps}
+
+                          </TableCell>
+                          <TableCell align="right">
+                            {data?.average}
+
+                          </TableCell>
+
+                        </TableRow>
+                      ))}
+
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </Grid>
+            </Fragment>
+          </Grid>
+          <SimpleSnackbar open={modalOpen} setOpen={setModalOpen} />
+        </Box >
+      </Box>
+    </ThemeProvider>
 
 
   );
