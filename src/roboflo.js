@@ -60,7 +60,7 @@ const Roboflow = (props) => {
       } else {
         clearInterval(interval)
       }
-    }, 10);
+    }, 100);
     return () => clearInterval(interval);
   }, [RoboModel, Coordinates]);
 
@@ -83,7 +83,6 @@ const Roboflow = (props) => {
 
       webcamRef.current.video.width = videoWidth;
       webcamRef.current.video.height = videoHeight;
-      console.log(webcamRef.current)
       adjustCanvas(videoWidth, videoHeight);
 
       const detections = await model.detect(webcamRef.current.video);
@@ -114,7 +113,7 @@ const Roboflow = (props) => {
       ctx.strokeStyle = 'red'
       const orderedByConfindence = orderBy(detections, (item) => item?.bbox, ['confidence'])
 
-      ctx.rect(Coordinates?.x - 10, Coordinates?.y - 10, Coordinates?.width + 20, Coordinates?.height + 20);
+      ctx.rect(Coordinates?.x, Coordinates?.y, Coordinates?.width, Coordinates?.height);
       ctx.stroke();
       const isPointInPath = ctx.isPointInPath(Coordinates?.bbox?.x, Coordinates?.bbox?.y);
     }

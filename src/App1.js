@@ -11,7 +11,7 @@ import layer from './assets/layer.svg'
 function App() {
   const videoRef = React.useRef()
   const [modalOpen, setModalOpen] = React.useState(false);
-  const [name, setName] = useState('')
+  const [name, setName] = useState('Sagar')
   const [laps, setLaps] = useState(3)
   const [raceStart, setRaceStart] = useState(false)
   const [lapEnd, setLapEnds] = useState(false)
@@ -24,27 +24,32 @@ function App() {
   const [initialCoordinate, setInitialCoordinate] = useState(null)
   const [soloCar, setSoloCar] = useState(null)
 
-
+  useEffect(() => {
+    let savedLeaderBoard = localStorage.getItem('savedLeaderBoard') ? JSON.parse(localStorage.getItem('savedLeaderBoard')) : []
+    if (savedLeaderBoard.length) {
+      setLeaderboard(savedLeaderBoard)
+    }
+  }, [])
 
   useEffect(() => {
     const interval = setInterval(() => {
       if (raceStart) {
-        setMillieSecond((seconds) => seconds + 200);
+        setMillieSecond((seconds) => seconds + 100);
 
       } else {
         setMillieSecond(0)
         clearInterval(interval)
       }
-    }, 200);
+    }, 100);
     return () => clearInterval(interval);
   }, [raceStart]);
 
   //check if lap isCompleted
   useEffect(() => {
     if (lapEnd) {
-      setLapRecord([...lapRecord, { time: ((millieSecond / 1000)), laps: lapRecord.length + 1 }])
-      setMillieSecond(0)
-      setLapEnds(false)
+      // setLapRecord([...lapRecord, { time: ((millieSecond / 1000)), laps: lapRecord.length + 1 }])
+      // setMillieSecond(0)
+      // setLapEnds(false)
     }
   }, [lapEnd])
 
@@ -54,7 +59,6 @@ function App() {
   }
 
   useEffect(() => {
-    const time = randomIntFromInterval(3000, 4000)
 
     let checkIfLapEnds = predictions && checkIfCarIsInFinishRectangle(
       {
@@ -65,12 +69,19 @@ function App() {
       }
 
     )
+    if (checkIfLapEnds) {
+
+      console.log(checkIfLapEnds, lapEnd)
+    }
     if (checkIfLapEnds && millieSecond > 3000) {
-      setLapEnds(true)
+      setLapRecord([...lapRecord, { time: ((millieSecond / 1000)), laps: lapRecord.length + 1 }])
+      setMillieSecond(0)
 
     }
 
-  }, [millieSecond])
+  }, [millieSecond, predictions])
+
+
 
   //check if race is completed 
   useEffect(() => {
@@ -100,6 +111,9 @@ function App() {
       average
     }
     setLeaderboard([...leaderboard, finalObj])
+    let savedLeaderBoard = localStorage.getItem('savedLeaderBoard') ? JSON.parse(localStorage.getItem('savedLeaderBoard')) : []
+    savedLeaderBoard = [...savedLeaderBoard, finalObj]
+    localStorage.setItem('savedLeaderBoard', JSON.stringify(savedLeaderBoard))
     setLapRecord([])
     setLapEnds(false)
     setLaps(3)
@@ -118,8 +132,8 @@ function App() {
 
   useEffect(() => {
     if (!raceStart && !!predictions.length) {
-
       setSoloCar(predictions[0])
+
       setInitialCoordinate(predictions[0]?.bbox)
     }
     if (raceStart) {
@@ -134,16 +148,14 @@ function App() {
 
   const checkIfCarIsInFinishRectangle = (rectB) => {
     let rectA = {
-      x: initialCoordinate?.x - 100,
-      y: initialCoordinate?.y - 100,
-      width: initialCoordinate?.width + 100,
-      height: initialCoordinate?.height + 100
+      x: initialCoordinate?.x,
+      y: initialCoordinate?.y,
+      width: initialCoordinate?.width,
+      height: initialCoordinate?.height
     }
     if (rectB) {
-      return !(rectA.x + rectA.width < rectB.x ||
-        rectB.x + rectB.width < rectA.x ||
-        rectA.y + rectA.height < rectB.y ||
-        rectB.y + rectB.height < rectA.y);
+      return Math.abs(rectA.x - rectB.x) < 30
+
     }
 
     return false
@@ -151,6 +163,7 @@ function App() {
   };
   const handleSetPrediction = (data) => {
     const orderedByConfindence = _.orderBy(data, (item) => item?.bbox, ['confidence'])
+
     setPredictions(orderedByConfindence)
   }
 
