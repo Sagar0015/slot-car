@@ -181,7 +181,7 @@ function App() {
         <Box p={'10px 0 30px 0'} sx={{ background: `linear-gradient(0deg,#009FFD,rgba(31,6,85,.1)),url(${layer}),linear-gradient(180deg,#1f0655,#009FFD)` }}>
           <Topbar />
           <Box display={'flex'} alignItems={'center'} gap={'30px'} p={'0 30px'}>
-            <Box display={'flex'} width={'50%'} flexDirection={'column'} gap={'15px'}>
+            <Box display={'flex'} width={'30%'} flexDirection={'column'} gap={'15px'}>
               <FormControl>
                 <FormLabel>
                   <Typography color="white">
@@ -264,7 +264,7 @@ function App() {
                 </Button>
               </Box>
             </Box>
-            <Box position={'relative'} margin={'0 auto'} width={'50%'} height={'80vh'}>
+            <Box position={'relative'} margin={'0 auto'} width={'65%'} height={'80vh'}>
 
               <Roboflow
                 handleSetPrediction={handleSetPrediction}
