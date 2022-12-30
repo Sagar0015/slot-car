@@ -79,11 +79,12 @@ const Roboflow = (props) => {
       webcamRef.current !== null &&
       webcamRef.current.video.readyState === 4
     ) {
-      const videoWidth = webcamRef.current.video.videoWidth;
-      const videoHeight = webcamRef.current.video.videoHeight;
+      const videoWidth = webcamRef.current.video.clientWidth;
+      const videoHeight = webcamRef.current.video.clientHeight;
 
-      webcamRef.current.video.width = videoWidth;
-      webcamRef.current.video.height = videoHeight;
+      webcamRef.current.video.width = webcamRef.current.video.clientWidth;
+      webcamRef.current.video.height = webcamRef.current.video.clientHeight;
+
       adjustCanvas(videoWidth, videoHeight);
 
       const detections = await model.detect(webcamRef.current.video);
