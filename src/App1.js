@@ -1,5 +1,5 @@
 import './App.css';
-import { Box, Button, FormControl, FormLabel, Grid, MenuItem, Paper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material';
+import { Box, Button, FormControl, FormLabel, Grid, MenuItem, Paper, Select, Stack, Switch, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography, styled } from '@mui/material';
 import React, { Fragment, useEffect, useState } from 'react';
 import _, { isEmpty, isEqual, orderBy, sumBy } from 'lodash'
 import Roboflow from './roboflo';
@@ -10,6 +10,49 @@ import { ThemeProvider } from '@mui/system';
 import { appTheme } from './theme';
 import { model, version } from './constant';
 import ConfirmationDialog from './components/ConfirmationDialog';
+
+
+const AntSwitch = styled(Switch)(({ theme }) => ({
+  width: 28,
+  height: 16,
+  padding: 0,
+  display: 'flex',
+  '&:active': {
+    '& .MuiSwitch-thumb': {
+      width: 15,
+    },
+    '& .MuiSwitch-switchBase.Mui-checked': {
+      transform: 'translateX(9px)',
+    },
+  },
+  '& .MuiSwitch-switchBase': {
+    padding: 2,
+    '&.Mui-checked': {
+      transform: 'translateX(12px)',
+      color: '#fff',
+      '& + .MuiSwitch-track': {
+        opacity: 1,
+        backgroundColor: theme.palette.primary.main,
+      },
+    },
+  },
+  '& .MuiSwitch-thumb': {
+    boxShadow: '0 2px 4px 0 rgb(0 35 11 / 20%)',
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    transition: theme.transitions.create(['width'], {
+      duration: 200,
+    }),
+  },
+  '& .MuiSwitch-track': {
+    borderRadius: 16 / 2,
+    opacity: 1,
+    backgroundColor: theme.palette.primary.main,
+
+    boxSizing: 'border-box',
+  },
+}));
 
 function App() {
   const videoRef = React.useRef()
@@ -180,6 +223,8 @@ function App() {
 
   }
   const [openModal, setOpenModal] = React.useState(false);
+  const [rankByAverage, setRankByAverage] = React.useState(false);
+
 
   const handleResetLeaderboard = () => {
     console.log('sad')
@@ -188,6 +233,7 @@ function App() {
     localStorage.removeItem('savedLeaderBoard')
     setLeaderboard([])
   }
+  const rankBy = rankByAverage ? ['average', 'laps'] : ['bestLapTime', 'laps']
   return (
     <ThemeProvider theme={appTheme}>
 
@@ -292,10 +338,18 @@ function App() {
 
         </Box>
         <Box p={'40px'}>
+          <Stack direction="row" spacing={1} alignItems="center">
+            <Typography> Best lap time</Typography>
 
+            <AntSwitch checked={rankByAverage} onChange={() => setRankByAverage(!rankByAverage)} inputProps={{ 'aria-label': 'ant design' }} />
+            <Typography> Average time</Typography>
+
+
+          </Stack>
           <Grid container spacing={2}>
 
             <Fragment>
+
               <Grid item xs={5}>
                 <TableContainer sx={{ background: '#fff' }} component={Paper}>
                   <Table aria-label="simple table">
@@ -317,7 +371,7 @@ function App() {
                         </TableCell>
                         <TableCell align="right">
                           <Typography color={'white'} fontWeight={600}>
-                            Best Lap time
+                            Lap time
                           </Typography>
                         </TableCell>
                       </TableRow>
@@ -326,12 +380,14 @@ function App() {
                 </TableContainer>
                 <TableContainer sx={{ height: '430px', overflow: 'auto', background: '#fff' }} >
                   <Table>
-                    <TableBody>
-                      {leaderboard && orderBy(leaderboard, ['laps', 'average',], ['desc', 'asc']).map(data => (
+                    <TableBody>{console.log('rankBy', rankBy)}
+                      {leaderboard && orderBy(leaderboard, rankBy, ['asc',]).map(data => (
                         <TableRow
 
                         >
-                          <TableCell component="td" scope="row">
+                          <TableCell
+                            sx={{ padding: '0 0 0 5px' }}
+                            component="td" scope="row">
                             {data?.name}
                           </TableCell>
                           <TableCell align="right">
@@ -339,11 +395,11 @@ function App() {
 
                           </TableCell>
                           <TableCell align="right">
-                            {data?.average}
+                            {data?.average}s
 
                           </TableCell>
                           <TableCell align="right">
-                            {data?.bestLapTime}
+                            {data?.bestLapTime}s
                           </TableCell>
 
                         </TableRow>
@@ -352,7 +408,7 @@ function App() {
                     </TableBody>
                   </Table>
                 </TableContainer>
-                <Box display={'flex'} mt={'20px'} gap={'30px'} justifyContent={'space-around'}>
+                <Box display={'flex'} width={'50%'} mt={'20px'} gap={'30px'} justifyContent={'space-around'}>
                   <Button onClick={() => setOpenModal(true)} color="error" fullWidth variant='contained'>
                     Reset Leaderboard
                   </Button>
