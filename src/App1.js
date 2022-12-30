@@ -9,6 +9,7 @@ import layer from './assets/layer.svg'
 import { ThemeProvider } from '@mui/system';
 import { appTheme } from './theme';
 import { model, version } from './constant';
+import ConfirmationDialog from './components/ConfirmationDialog';
 
 function App() {
   const videoRef = React.useRef()
@@ -108,11 +109,15 @@ function App() {
   const handleStop = () => {
     setRaceStart(false)
     let average = (Number(sumBy(lapRecord, 'time') / lapRecord.length)).toFixed(2)
+    const bestLapTime = _.orderBy(lapRecord, (item) => item, ['time'])[0]?.time ?? null
+
     setAverageTime(average);
     let finalObj = {
       name,
       laps: lapRecord.length,
-      average
+      average,
+      lapRecord: lapRecord,
+      bestLapTime: bestLapTime
     }
     setLeaderboard([...leaderboard, finalObj])
     let savedLeaderBoard = localStorage.getItem('savedLeaderBoard') ? JSON.parse(localStorage.getItem('savedLeaderBoard')) : []
@@ -174,6 +179,15 @@ function App() {
   const handleSetFinishLineCoordinate = () => {
 
   }
+  const [openModal, setOpenModal] = React.useState(false);
+
+  const handleResetLeaderboard = () => {
+    console.log('sad')
+    setOpenModal(false)
+
+    localStorage.removeItem('savedLeaderBoard')
+    setLeaderboard([])
+  }
   return (
     <ThemeProvider theme={appTheme}>
 
@@ -181,7 +195,7 @@ function App() {
         <Box p={'10px 0 30px 0'} sx={{ background: `linear-gradient(0deg,#009FFD,rgba(31,6,85,.1)),url(${layer}),linear-gradient(180deg,#1f0655,#009FFD)` }}>
           <Topbar />
           <Box display={'flex'} alignItems={'center'} gap={'30px'} p={'0 30px'}>
-            <Box display={'flex'} width={'30%'} flexDirection={'column'} gap={'15px'}>
+            <Box display={'flex'} width={'40%'} flexDirection={'column'} gap={'15px'}>
               <FormControl>
                 <FormLabel>
                   <Typography color="white">
@@ -264,7 +278,7 @@ function App() {
                 </Button>
               </Box>
             </Box>
-            <Box position={'relative'} margin={'0 auto'} width={'65%'} height={'80vh'}>
+            <Box position={'relative'} margin={'0 auto'} width={'55%'} height={'80vh'}>
 
               <Roboflow
                 handleSetPrediction={handleSetPrediction}
@@ -279,93 +293,10 @@ function App() {
         </Box>
         <Box p={'40px'}>
 
-          <Grid container spacing={4}>
+          <Grid container spacing={2}>
 
             <Fragment>
-
-              <Grid item xs={6}>
-                {/* <Box display={'flex'} flexDirection={'column'} gap={'15px'}>
-                <FormControl>
-                  <FormLabel>
-                    <Typography color="black">
-                      Name
-                    </Typography>
-                  </FormLabel>
-                  <TextField value={name} onChange={(e) => { setName(e.target.value) }} />
-                </FormControl>
-                <FormControl>
-                  <FormLabel>
-                    <Typography color="black">
-                      No of laps
-                    </Typography>
-                  </FormLabel>
-                  <Select
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
-                    value={laps}
-                    label="Age"
-                    onChange={(e) => {
-                      setLaps(e.target.value)
-                    }}
-                  >
-                    <MenuItem value={1}>1</MenuItem>
-                    <MenuItem value={2}>2</MenuItem>
-                    <MenuItem value={3}>3</MenuItem>
-                    <MenuItem value={4}>4</MenuItem>
-                    <MenuItem value={5}>5</MenuItem>
-                    <MenuItem value={6}>6</MenuItem>
-
-                  </Select>
-                </FormControl>
-                <Button onClick={handleStart} disabled={raceStart} variant='contained'>
-                  Start
-                </Button>
-                <Box>
-                  <TableContainer component={Paper}>
-                    <Table aria-label="simple table">
-                      <TableHead>
-                        <TableRow>
-                          <TableCell>
-                            <Typography fontWeight={600}>
-                              Laps
-                            </Typography>
-                          </TableCell>
-                          <TableCell align="right">
-                            <Typography fontWeight={600}>
-                              Time
-                            </Typography></TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-
-                        {lapRecord && lapRecord.map(data => (
-                          <TableRow
-
-                          >
-                            <TableCell component="th" scope="row">
-                              {data?.laps}
-                            </TableCell>
-                            <TableCell align="right">                          {data?.time.toFixed(2)} sec
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </Box>
-                <Box>
-                  {!!lapRecord.length && averageTime && <Typography variant={"h6"}>Average time {averageTime}sec</Typography>}
-                </Box>
-                <Box display={'flex'} gap={'30px'} justifyContent={'space-around'}>
-                  <Button disabled={isEmpty(lapRecord)} onClick={handleStop} fullWidth color="error" variant='contained'>
-                    Stop and save
-                  </Button>   <Button onClick={handleReset} fullWidth variant='contained'>
-                    Reset
-                  </Button>
-                </Box>
-              </Box> */}
-              </Grid>
-              <Grid item xs={6}>
+              <Grid item xs={5}>
                 <TableContainer sx={{ background: '#fff' }} component={Paper}>
                   <Table aria-label="simple table">
                     <TableHead sx={{ background: '#847ad1' }}>
@@ -384,6 +315,11 @@ function App() {
                             Average time
                           </Typography>
                         </TableCell>
+                        <TableCell align="right">
+                          <Typography color={'white'} fontWeight={600}>
+                            Best Lap time
+                          </Typography>
+                        </TableCell>
                       </TableRow>
                     </TableHead>
                   </Table>
@@ -395,7 +331,7 @@ function App() {
                         <TableRow
 
                         >
-                          <TableCell component="th" scope="row">
+                          <TableCell component="td" scope="row">
                             {data?.name}
                           </TableCell>
                           <TableCell align="right">
@@ -406,6 +342,9 @@ function App() {
                             {data?.average}
 
                           </TableCell>
+                          <TableCell align="right">
+                            {data?.bestLapTime}
+                          </TableCell>
 
                         </TableRow>
                       ))}
@@ -413,7 +352,23 @@ function App() {
                     </TableBody>
                   </Table>
                 </TableContainer>
+                <Box display={'flex'} mt={'20px'} gap={'30px'} justifyContent={'space-around'}>
+                  <Button onClick={() => setOpenModal(true)} color="error" fullWidth variant='contained'>
+                    Reset Leaderboard
+                  </Button>
+                  <ConfirmationDialog
+                    setOpenModal={setOpenModal}
+                    openModal={openModal}
+                    acceptText={'Confirm'}
+                    rejectText={'Cancel'}
+                    title={'Are you sure you want to leave reset leaderboard?'}
+                    handleConfirm={() => handleResetLeaderboard()}
+                  />
+
+                </Box>
               </Grid>
+
+
             </Fragment>
           </Grid>
           <SimpleSnackbar open={modalOpen} setOpen={setModalOpen} />
