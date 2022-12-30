@@ -238,9 +238,9 @@ function App() {
     <ThemeProvider theme={appTheme}>
 
       <Box bgcolor={'#f0eef9'}>
-        <Box p={'10px 0 30px 0'} sx={{ background: `linear-gradient(0deg,#009FFD,rgba(31,6,85,.1)),url(${layer}),linear-gradient(180deg,#1f0655,#009FFD)` }}>
+        <Box p={'10px 10px 30px 10px'} sx={{ background: `linear-gradient(0deg,#009FFD,rgba(31,6,85,.1)),url(${layer}),linear-gradient(180deg,#1f0655,#009FFD)` }}>
           <Topbar />
-          <Box display={'flex'} alignItems={'center'} gap={'30px'} p={'0 30px'}>
+          <Box mt={'30px'} display={'flex'} alignItems={'center'} gap={'30px'} p={'0 30px'}>
             <Box display={'flex'} width={'40%'} flexDirection={'column'} gap={'15px'}>
               <FormControl>
                 <FormLabel>
