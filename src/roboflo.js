@@ -3,8 +3,9 @@ import { Box } from "@mui/system";
 import { orderBy } from "lodash";
 import { useRef, useEffect, useState } from "react";
 import Webcam from "react-webcam";
+import { roboflowKey } from "./constant";
 
-export const key = 'rf_BfXqX0b70aeyibaAl5eRhqgy2yJ3'
+export const key = roboflowKey
 const Roboflow = (props) => {
   const { initialCoordinate } = props
   const webcamRef = useRef(null);

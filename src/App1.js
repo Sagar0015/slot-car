@@ -1,4 +1,3 @@
-import logo from './logo.svg';
 import './App.css';
 import { Box, Button, FormControl, FormLabel, Grid, MenuItem, Paper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material';
 import React, { Fragment, useEffect, useState } from 'react';
@@ -9,6 +8,7 @@ import Topbar from './components/Topbar';
 import layer from './assets/layer.svg'
 import { ThemeProvider } from '@mui/system';
 import { appTheme } from './theme';
+import { model, version } from './constant';
 
 function App() {
   const videoRef = React.useRef()
@@ -268,7 +268,7 @@ function App() {
 
               <Roboflow
                 handleSetPrediction={handleSetPrediction}
-                modelName="slot-car-racing" modelVersion="1"
+                modelName={model} modelVersion={version}
                 handleSetFinishLineCoordinate={handleSetFinishLineCoordinate}
                 initialCoordinate={initialCoordinate}
 
