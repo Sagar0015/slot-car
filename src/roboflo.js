@@ -4,10 +4,11 @@ import { orderBy } from "lodash";
 import { useRef, useEffect, useState } from "react";
 import Webcam from "react-webcam";
 import { roboflowKey } from "./constant";
+import _ from 'lodash'
 
 export const key = roboflowKey
 const Roboflow = (props) => {
-  const { initialCoordinate } = props
+  const { initialCoordinate, setFps } = props
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
 
@@ -72,6 +73,8 @@ const Roboflow = (props) => {
   //     if (model) model.teardown();
   // };
 
+  var prevTime;
+  var pastFrameTimes = [];
   const detect = async (model) => {
     // Check data is available
     if (
@@ -79,12 +82,26 @@ const Roboflow = (props) => {
       webcamRef.current !== null &&
       webcamRef.current.video.readyState === 4
     ) {
+      requestAnimationFrame(detect);
+      if (prevTime) {
+        pastFrameTimes.push(Date.now() - prevTime);
+        if (pastFrameTimes.length > 30) pastFrameTimes.shift();
+
+        var total = 0;
+        _.each(pastFrameTimes, function (t) {
+          total += t / 1000;
+        });
+
+        var fps = pastFrameTimes.length / total;
+        setFps(fps)
+      }
+      prevTime = Date.now();
+
       const videoWidth = webcamRef.current.video.width;
       const videoHeight = webcamRef.current.video.clientHeight;
 
       webcamRef.current.video.width = webcamRef.current.video.clientWidth;
       webcamRef.current.video.height = webcamRef.current.video.clientHeight;
-      console.log('test', videoHeight)
       adjustCanvas(videoWidth, videoHeight, videoWidth);
 
       const detections = await model.detect(webcamRef.current.video);

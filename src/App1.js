@@ -66,6 +66,10 @@ function App() {
   const [lapRecord, setLapRecord] = useState([])
   const [averageTime, setAverageTime] = useState(null)
   const [millieSecond, setMillieSecond] = useState(0)
+  const [FPS, setFps] = useState(0)
+  const [displayFps, setDisplayFps] = useState(true)
+
+
   const [leaderboard, setLeaderboard] = useState([
 
   ])
@@ -333,8 +337,14 @@ function App() {
                 modelName={model} modelVersion={version}
                 handleSetFinishLineCoordinate={handleSetFinishLineCoordinate}
                 initialCoordinate={initialCoordinate}
+                setFps={setFps}
 
               />
+              <Box display={'flex'} alignItems={'center'} position={'absolute'} bottom={-60} gap={'20px'} right={10} >
+                {displayFps && <Typography fontWeight={700} color={'white'}>{Math.floor(FPS / 1000)} fps</Typography>}
+
+                <Button size='small' onClick={() => setDisplayFps(!displayFps)} variant={'outlined'}>{displayFps ? 'Hide' : 'Show'} fps</Button>
+              </Box>
             </Box>
           </Box>
 
