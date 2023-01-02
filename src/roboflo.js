@@ -234,7 +234,7 @@ const Roboflow = (props) => {
         <Box display={'flex'} flexDirection={'column'} justifyContent={'center'} alignItems={'center'} gap={'20px'}>
 
           <CircularProgress />
-          <Typography color="white">Modal loading</Typography>
+          <Typography color="white">Model loading</Typography>
         </Box>
       </Backdrop>
 
