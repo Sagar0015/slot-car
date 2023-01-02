@@ -10,6 +10,8 @@ import { ThemeProvider } from '@mui/system';
 import { appTheme } from './theme';
 import { model, version } from './constant';
 import ConfirmationDialog from './components/ConfirmationDialog';
+import test from './assets/car.gif'
+
 
 
 const AntSwitch = styled(Switch)(({ theme }) => ({
@@ -206,7 +208,7 @@ function App() {
       height: initialCoordinate?.height
     }
     if (rectB) {
-      return Math.abs(rectA.x - rectB.x) < 30
+      return Math.abs(rectA.x - rectB.x) < 2
 
     }
 
@@ -238,7 +240,7 @@ function App() {
     <ThemeProvider theme={appTheme}>
 
       <Box bgcolor={'#f0eef9'}>
-        <Box p={'10px 10px 30px 10px'} sx={{ background: `linear-gradient(0deg,#009FFD,rgba(31,6,85,.1)),url(${layer}),linear-gradient(180deg,#1f0655,#009FFD)` }}>
+        <Box height={'90vh'} p={'10px 10px 30px 10px'} sx={{ background: `linear-gradient(0deg,#009FFD,rgba(31,6,85,.1)),url(${layer}),linear-gradient(180deg,#1f0655,#009FFD)` }}>
           <Topbar />
           <Box mt={'30px'} display={'flex'} alignItems={'center'} gap={'30px'} p={'0 30px'}>
             <Box display={'flex'} width={'40%'} flexDirection={'column'} gap={'15px'}>
@@ -324,7 +326,7 @@ function App() {
                 </Button>
               </Box>
             </Box>
-            <Box position={'relative'} margin={'0 auto'} width={'55%'} height={'80vh'}>
+            <Box position={'relative'} margin={'0 auto'} width={'55%'} height={'80vh'} maxHeight={'566px'}>
 
               <Roboflow
                 handleSetPrediction={handleSetPrediction}
@@ -350,80 +352,88 @@ function App() {
 
             <Fragment>
 
-              <Grid item xs={5}>
-                <TableContainer sx={{ background: '#fff' }} component={Paper}>
-                  <Table aria-label="simple table">
-                    <TableHead sx={{ background: '#847ad1' }}>
-                      <TableRow>
-                        <TableCell>
-                          <Typography color={'white'} fontWeight={600}>
-                            Name
-                          </Typography>
-                        </TableCell>
-                        <TableCell align="right">
-                          <Typography color={'white'} fontWeight={600}>
-                            Laps
-                          </Typography></TableCell>
-                        <TableCell align="right">
-                          <Typography color={'white'} fontWeight={600}>
-                            Average time
-                          </Typography>
-                        </TableCell>
-                        <TableCell align="right">
-                          <Typography color={'white'} fontWeight={600}>
-                            Lap time
-                          </Typography>
-                        </TableCell>
-                      </TableRow>
-                    </TableHead>
-                  </Table>
-                </TableContainer>
-                <TableContainer sx={{ height: '430px', overflow: 'auto', background: '#fff' }} >
-                  <Table>
-                    <TableBody>{console.log('rankBy', rankBy)}
-                      {leaderboard && orderBy(leaderboard, rankBy, ['asc',]).map(data => (
-                        <TableRow
+              <Grid item xs={6}>
+                <Box width={'100%'} height={'100%'}>
 
-                        >
-                          <TableCell
-                            sx={{ padding: '0 0 0 5px' }}
-                            component="td" scope="row">
-                            {data?.name}
+                  <TableContainer sx={{ background: '#fff' }} component={Paper}>
+                    <Table aria-label="simple table">
+                      <TableHead sx={{ background: '#847ad1' }}>
+                        <TableRow>
+                          <TableCell>
+                            <Typography color={'white'} fontWeight={600}>
+                              Name
+                            </Typography>
                           </TableCell>
                           <TableCell align="right">
-                            {data?.laps}
-
+                            <Typography color={'white'} fontWeight={600}>
+                              Laps
+                            </Typography></TableCell>
+                          <TableCell align="right">
+                            <Typography color={'white'} fontWeight={600}>
+                              Average time
+                            </Typography>
                           </TableCell>
                           <TableCell align="right">
-                            {data?.average}s
-
+                            <Typography color={'white'} fontWeight={600}>
+                              Lap time
+                            </Typography>
                           </TableCell>
-                          <TableCell align="right">
-                            {data?.bestLapTime}s
-                          </TableCell>
-
                         </TableRow>
-                      ))}
+                      </TableHead>
+                    </Table>
+                  </TableContainer>
+                  <TableContainer sx={{ height: '430px', overflow: 'auto', background: '#fff' }} >
+                    <Table>
+                      <TableBody>{console.log('rankBy', rankBy)}
+                        {leaderboard && orderBy(leaderboard, rankBy, ['asc',]).map(data => (
+                          <TableRow
 
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-                <Box display={'flex'} width={'50%'} mt={'20px'} gap={'30px'} justifyContent={'space-around'}>
-                  <Button onClick={() => setOpenModal(true)} color="error" fullWidth variant='contained'>
-                    Reset Leaderboard
-                  </Button>
-                  <ConfirmationDialog
-                    setOpenModal={setOpenModal}
-                    openModal={openModal}
-                    acceptText={'Confirm'}
-                    rejectText={'Cancel'}
-                    title={'Are you sure you want to leave reset leaderboard?'}
-                    handleConfirm={() => handleResetLeaderboard()}
-                  />
+                          >
+                            <TableCell
+                              sx={{ padding: '0 0 0 5px' }}
+                              component="td" scope="row">
+                              {data?.name}
+                            </TableCell>
+                            <TableCell align="right">
+                              {data?.laps}
 
+                            </TableCell>
+                            <TableCell align="right">
+                              {data?.average}s
+
+                            </TableCell>
+                            <TableCell align="right">
+                              {data?.bestLapTime}s
+                            </TableCell>
+
+                          </TableRow>
+                        ))}
+
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                  <Box display={'flex'} width={'50%'} mt={'20px'} gap={'30px'} justifyContent={'space-around'}>
+                    <Button onClick={() => setOpenModal(true)} color="error" fullWidth variant='contained'>
+                      Reset Leaderboard
+                    </Button>
+                    <ConfirmationDialog
+                      setOpenModal={setOpenModal}
+                      openModal={openModal}
+                      acceptText={'Confirm'}
+                      rejectText={'Cancel'}
+                      title={'Are you sure you want to leave reset leaderboard?'}
+                      handleConfirm={() => handleResetLeaderboard()}
+                    />
+
+                  </Box>
                 </Box>
               </Grid>
+              <Grid item xs={6}>
+                <Box width={'100%'} height={'100%'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
 
+                  <img src={test} alt={'ces'} style={{ width: '100%', height: '100%', objectFit: 'contain', paddingBottom: '40px' }} />
+                </Box>
+              </Grid>
 
             </Fragment>
           </Grid>

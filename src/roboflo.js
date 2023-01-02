@@ -79,13 +79,13 @@ const Roboflow = (props) => {
       webcamRef.current !== null &&
       webcamRef.current.video.readyState === 4
     ) {
-      const videoWidth = webcamRef.current.video.clientWidth;
+      const videoWidth = webcamRef.current.video.width;
       const videoHeight = webcamRef.current.video.clientHeight;
 
       webcamRef.current.video.width = webcamRef.current.video.clientWidth;
       webcamRef.current.video.height = webcamRef.current.video.clientHeight;
-
-      adjustCanvas(videoWidth, videoHeight);
+      console.log('test', videoHeight)
+      adjustCanvas(videoWidth, videoHeight, videoWidth);
 
       const detections = await model.detect(webcamRef.current.video);
 
@@ -101,7 +101,7 @@ const Roboflow = (props) => {
     canvasRef.current.height = h * window.devicePixelRatio;
 
     canvasRef.current.style.width = w + "px";
-    canvasRef.current.style.height = h + "px";
+    canvasRef.current.style.height = 80 + "vh";
 
     canvasRef.current.getContext("2d").scale(window.devicePixelRatio, window.devicePixelRatio);
   };
@@ -220,7 +220,7 @@ const Roboflow = (props) => {
         }}
       />
       <canvas ref={canvasRef}
-        style={{ position: 'absolute', inset: 0, zIndex: 20, textAlign: 'center', }}
+        style={{ position: 'absolute', inset: 0, zIndex: 20, textAlign: 'center', maxHeight: '566px' }}
 
       />
 
