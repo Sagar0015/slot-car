@@ -103,15 +103,15 @@ const Roboflow = (props) => {
 
       webcamRef.current.video.width = webcamRef.current.video.clientWidth;
       webcamRef.current.video.height = webcamRef.current.video.clientHeight;
-      console.log('webcamRef.current.video.clientHeight', webcamRef.current.video.clientHeight)
       adjustCanvas(videoWidth, videoHeight);
 
       const detections = await model.detect(webcamRef.current.video);
-      const filteredDetections = detections.filter(item => item?.confidence > 0.35)
-      props.handleSetPrediction(detections)
+      const filteredDetections = detections.filter(item => !item?.class.includes('grey') && item?.confidence > 0.3)
+      console.log('filteredDetections', filteredDetections)
+      props.handleSetPrediction(filteredDetections)
       const ctx = canvasRef?.current?.getContext("2d");
 
-      drawBoxes(detections, ctx);
+      drawBoxes(filteredDetections, ctx);
     }
   };
 
