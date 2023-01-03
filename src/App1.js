@@ -378,7 +378,7 @@ function App() {
                           </TableCell>
                           <TableCell align="right">
                             <Typography color={'white'} fontWeight={600}>
-                             Best Lap time
+                              Best Lap time
                             </Typography>
                           </TableCell>
                         </TableRow>
