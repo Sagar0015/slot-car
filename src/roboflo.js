@@ -75,37 +75,39 @@ const Roboflow = (props) => {
 
   var prevTime;
   var pastFrameTimes = [];
-  const detect = async (model) => {
+  const detect = async () => {
+    const model = RoboModel
     // Check data is available
     if (
       typeof webcamRef.current !== "undefined" &&
       webcamRef.current !== null &&
       webcamRef.current.video.readyState === 4
     ) {
-      requestAnimationFrame(detect);
-      if (prevTime) {
-        pastFrameTimes.push(Date.now() - prevTime);
-        if (pastFrameTimes.length > 30) pastFrameTimes.shift();
+      // requestAnimationFrame(detect);
+      // if (prevTime) {
+      //   pastFrameTimes.push(Date.now() - prevTime);
+      //   if (pastFrameTimes.length > 30) pastFrameTimes.shift();
 
-        var total = 0;
-        _.each(pastFrameTimes, function (t) {
-          total += t / 1000;
-        });
+      //   var total = 0;
+      //   _.each(pastFrameTimes, function (t) {
+      //     total += t / 1000;
+      //   });
 
-        var fps = pastFrameTimes.length / total;
-        setFps(fps)
-      }
-      prevTime = Date.now();
+      //   var fps = pastFrameTimes.length / total;
+      //   setFps(fps)
+      // }
+      // prevTime = Date.now();
 
-      const videoWidth = webcamRef.current.video.width;
+      const videoWidth = webcamRef.current.video.clientWidth;
       const videoHeight = webcamRef.current.video.clientHeight;
 
       webcamRef.current.video.width = webcamRef.current.video.clientWidth;
       webcamRef.current.video.height = webcamRef.current.video.clientHeight;
-      adjustCanvas(videoWidth, videoHeight, videoWidth);
+      console.log('webcamRef.current.video.clientHeight', webcamRef.current.video.clientHeight)
+      adjustCanvas(videoWidth, videoHeight);
 
       const detections = await model.detect(webcamRef.current.video);
-
+      const filteredDetections = detections.filter(item => item?.confidence > 0.35)
       props.handleSetPrediction(detections)
       const ctx = canvasRef?.current?.getContext("2d");
 
@@ -118,7 +120,7 @@ const Roboflow = (props) => {
     canvasRef.current.height = h * window.devicePixelRatio;
 
     canvasRef.current.style.width = w + "px";
-    canvasRef.current.style.height = 80 + "vh";
+    canvasRef.current.style.height = '80vh'
 
     canvasRef.current.getContext("2d").scale(window.devicePixelRatio, window.devicePixelRatio);
   };
@@ -130,11 +132,9 @@ const Roboflow = (props) => {
       ctx.beginPath();
       ctx.lineWidth = 1;
       ctx.strokeStyle = 'red'
-      const orderedByConfindence = orderBy(detections, (item) => item?.bbox, ['confidence'])
 
       ctx.rect(Coordinates?.x, Coordinates?.y, Coordinates?.width, Coordinates?.height);
       ctx.stroke();
-      const isPointInPath = ctx.isPointInPath(Coordinates?.bbox?.x, Coordinates?.bbox?.y);
     }
     detections.forEach((row) => {
       if (true) {
@@ -226,12 +226,14 @@ const Roboflow = (props) => {
         muted={true}
         style={{
           position: 'absolute', inset: 0, zIndex: 10, textAlign: 'center', borderRadius: '30px',
-          boxShadow: '0 13px 0 0 rgb(31 6 85 / 44%)'
+          boxShadow: '0 13px 0 0 rgb(31 6 85 / 44%)',
+          maxHeight: '566px'
           ,
         }
         }
         width="100%"
         height={'100%'}
+
         videoConstraints={{
           facingMode: 'environment',
         }}

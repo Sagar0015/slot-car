@@ -98,14 +98,7 @@ function App() {
     return () => clearInterval(interval);
   }, [raceStart]);
 
-  //check if lap isCompleted
-  useEffect(() => {
-    if (lapEnd) {
-      // setLapRecord([...lapRecord, { time: ((millieSecond / 1000)), laps: lapRecord.length + 1 }])
-      // setMillieSecond(0)
-      // setLapEnds(false)
-    }
-  }, [lapEnd])
+
 
 
   function randomIntFromInterval(min, max) { // min and max included 
@@ -113,19 +106,19 @@ function App() {
   }
 
   useEffect(() => {
+    const redCar = predictions?.filter(data => data?.class?.includes('red'))
 
-    let checkIfLapEnds = predictions && checkIfCarIsInFinishRectangle(
+    let checkIfLapEnds = redCar[0] && checkIfCarIsInFinishRectangle(
       {
-        x: predictions[0]?.bbox?.x,
-        y: predictions[0]?.bbox?.y,
-        width: predictions[0]?.bbox?.width,
-        height: predictions[0]?.bbox?.height
+        x: redCar[0]?.bbox?.x,
+        y: redCar[0]?.bbox?.y,
+        width: redCar[0]?.bbox?.width,
+        height: redCar[0]?.bbox?.height
       }
 
     )
     if (checkIfLapEnds) {
 
-      console.log(checkIfLapEnds, lapEnd)
     }
     if (checkIfLapEnds && millieSecond > 3000) {
       setLapRecord([...lapRecord, { time: ((millieSecond / 1000)), laps: lapRecord.length + 1 }])
@@ -190,13 +183,14 @@ function App() {
 
   useEffect(() => {
     if (!raceStart && !!predictions.length) {
-      setSoloCar(predictions[0])
+      const redCar = predictions?.filter(data => data?.class?.includes('red'))
+      const startLine = predictions?.filter(data => data?.class?.includes('line'))
+      setSoloCar(redCar[0])
 
-      setInitialCoordinate(predictions[0]?.bbox)
+      setInitialCoordinate(startLine[0]?.bbox)
     }
     if (raceStart) {
-      // console.log('prediction', predictions[0], 'soloCar', soloCar, 'initialCoordinate', initialCoordinate
-      // )
+
 
 
     }
@@ -212,7 +206,8 @@ function App() {
       height: initialCoordinate?.height
     }
     if (rectB) {
-      return Math.abs(rectA.x - rectB.x) < 2
+
+      return Math.abs(rectA.x - rectB.x) < 50 && Math.abs(rectA.y - rectB.y) < 50
 
     }
 
@@ -224,7 +219,6 @@ function App() {
 
     setPredictions(orderedByConfindence)
   }
-
   const handleSetFinishLineCoordinate = () => {
 
   }
@@ -233,7 +227,6 @@ function App() {
 
 
   const handleResetLeaderboard = () => {
-    console.log('sad')
     setOpenModal(false)
 
     localStorage.removeItem('savedLeaderBoard')
@@ -385,7 +378,7 @@ function App() {
                           </TableCell>
                           <TableCell align="right">
                             <Typography color={'white'} fontWeight={600}>
-                              Lap time
+                             Best Lap time
                             </Typography>
                           </TableCell>
                         </TableRow>
@@ -394,7 +387,7 @@ function App() {
                   </TableContainer>
                   <TableContainer sx={{ height: '430px', overflow: 'auto', background: '#fff' }} >
                     <Table>
-                      <TableBody>{console.log('rankBy', rankBy)}
+                      <TableBody>
                         {leaderboard && orderBy(leaderboard, rankBy, ['asc',]).map(data => (
                           <TableRow
 
