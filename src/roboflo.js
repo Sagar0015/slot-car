@@ -3,7 +3,7 @@ import { Box } from "@mui/system";
 import { orderBy } from "lodash";
 import { useRef, useEffect, useState } from "react";
 import Webcam from "react-webcam";
-import { roboflowKey } from "./constant";
+import { millieSecondTimeGapToFetchFromRoboflowApi, roboflowKey } from "./constant";
 import _ from 'lodash'
 
 export const key = roboflowKey
@@ -62,7 +62,7 @@ const Roboflow = (props) => {
       } else {
         clearInterval(interval)
       }
-    }, 100);
+    }, millieSecondTimeGapToFetchFromRoboflowApi);
     return () => clearInterval(interval);
   }, [RoboModel, Coordinates]);
 

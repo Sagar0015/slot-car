@@ -8,7 +8,7 @@ import Topbar from './components/Topbar';
 import layer from './assets/layer.svg'
 import { ThemeProvider } from '@mui/system';
 import { appTheme } from './theme';
-import { model, version } from './constant';
+import { finishLineBufferAmount, model, version } from './constant';
 import ConfirmationDialog from './components/ConfirmationDialog';
 import test from './assets/car.gif'
 
@@ -207,7 +207,7 @@ function App() {
     }
     if (rectB) {
 
-      return Math.abs(rectA.x - rectB.x) < 50 && Math.abs(rectA.y - rectB.y) < 50
+      return Math.abs(rectA.x - rectB.x) < 50 && Math.abs(rectA.y - rectB.y) < finishLineBufferAmount
 
     }
 
