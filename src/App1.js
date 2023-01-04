@@ -207,7 +207,7 @@ function App() {
     }
     if (rectB) {
 
-      return Math.abs(rectA.x - rectB.x) < 50 && Math.abs(rectA.y - rectB.y) < finishLineBufferAmount
+      return Math.abs(rectA.x - rectB.x) < finishLineBufferAmount && Math.abs(rectA.y - rectB.y) < 50
 
     }
 
